@@ -21,7 +21,8 @@ namespace DB {
             return static::$instance;
         }
 
-        public function getConnection(){
+        public function getConnection()
+        {
             return $this->conn;
         }
     }

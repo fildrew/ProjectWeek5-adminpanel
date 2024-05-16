@@ -35,7 +35,7 @@ $sql = 'CREATE TABLE IF NOT EXISTS users (
     lastname VARCHAR(255) NOT NULL, 
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    admin BOOLEAN NOT NULL DEFAULT 0
+    role varchar(255) NOT NULL DEFAULT "user"
 )';
 
 if (!$mysqli->query($sql)) {
@@ -49,12 +49,11 @@ $res = $mysqli->query($sqlSelect);
 if ($res->num_rows === 0) {
     $password = password_hash('Pa$$w0rd!', PASSWORD_DEFAULT);
       //INSERT INFO INTO TABLE
-    $sqlInsert = 'INSERT INTO users (firstname, lastname, email, password, admin) 
-        VALUES ("black", "blue", "some@example.com", "'.$password.'", 1)';
+    $sqlInsert = 'INSERT INTO users (firstname, lastname, email, password, role) 
+        VALUES ("John", "Doe", "johndoe@mailnator.com", "'.$password.'","admin" );';
   
-    if (!$mysqli->query($sqlInsert)) {
-        die('Errore nell\'inserimento del record: ' . $mysqli->error);
-    } else {
+    if(!$mysqli->query($sql)) { echo($mysqli->connect_error); }
+    else {
         echo 'Record aggiunto con successo!!!';
     }
 }

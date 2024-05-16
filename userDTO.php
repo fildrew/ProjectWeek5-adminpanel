@@ -12,7 +12,7 @@ class UserDTO{
         $res = $this->conn->query($sql, PDO::FETCH_ASSOC);
 
         if ($res) { 
-            return $res;
+            return $res->fetchAll();
         }
 
         return null;
@@ -21,19 +21,27 @@ class UserDTO{
     public function getUserByID(int $id){
         $sql = 'SELECT * FROM users WHERE id = :id';
         $stm = $this->conn->prepare($sql);
-        $res = $stm->execute(['id' => $id]);
+        $stm->execute(['id' => $id]);
 
-        if ($res) { 
-            return $res;
-        }
-        return null;
+        
+        return $stm->fetch(PDO::FETCH_ASSOC);
+        
+        
     }
 
+    public function getUserByEmail(array $email) {
+        $sql = 'SELECT * FROM users WHERE email = :email';
+        $stm = $this->conn->prepare($sql);
+        $stm->execute(['email' => $email]);
+
+        
+        return $stm->fetch(PDO::FETCH_ASSOC);
+    }
     public function saveUser(array $user) {
         $passwordHash = password_hash($user['password'], PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (firstname, lastname, email, password, admin) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO users (firstname, lastname, email, password, role) VALUES (:firstname,:lastname,:email,:password,:role)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$user['firstname'], $user['lastname'], $user['email'], $passwordHash, $user['admin']]);
+        $stmt->execute([$user['firstname'], $user['lastname'], $user['email'], $passwordHash, $user['role']]);
         return $this->conn->lastInsertId();
     }
     public function updateUser(array $user){
@@ -53,14 +61,14 @@ class UserDTO{
             }
         }
     
-        $sql = "UPDATE users SET firstname = :firstname, lastname = :lastname, email = :email, password = :password, admin = :admin WHERE id = :id";
+        $sql = "UPDATE users SET firstname = :firstname, lastname = :lastname, email = :email, password = :password, role = :role WHERE id = :id";
         $stm = $this->conn->prepare($sql);
         $stm->execute([
             'firstname' => $user['firstname'],
             'lastname' => $user['lastname'],
             'email' => $user['email'],
             'password' => $passwordHash, 
-            'admin' => $user['admin'],
+            'role' => $user['role'],
             'id' => $user['id'], 
         ]);
         return $stm->rowCount();
